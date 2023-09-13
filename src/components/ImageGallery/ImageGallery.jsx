@@ -1,7 +1,7 @@
 import { List } from './ImageGallery.styled';
 
-const ImageGallery = () => {
-  return <List className="gallery"></List>;
+const ImageGallery = ({ children }) => {
+  return <List>{children}</List>;
 };
 
 export default ImageGallery;
