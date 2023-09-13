@@ -4,6 +4,8 @@ import Searchbar from 'components/Searchbar/Searchbar';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Button from 'components/Button/Button';
+import Loader from 'components/Loader/Loader';
+import Modal from 'components/Modal/Modal';
 
 import { getImage } from 'services/getImageAPI';
 
@@ -16,12 +18,16 @@ class App extends Component {
     searchValue: '',
     page: 1,
     hits: null,
+    isLoader: false,
+    isLoadBtn: false,
   };
 
   componentDidUpdate(_, prevState) {
     const { searchValue, page } = this.state;
 
-    if (searchValue !== prevState.searchValue) {
+    if (searchValue !== prevState.searchValue || page !== prevState.page) {
+      this.setState({ isLoader: true });
+
       getImage(searchValue, page)
         .then(response => {
           if (!response.ok) {
@@ -37,21 +43,41 @@ class App extends Component {
             return;
           }
 
+          const lastPage = Math.ceil(data.totalHits / 12);
+
+          if (page === lastPage) {
+            this.setState({ isLoadBtn: true });
+            toast.info('No more images');
+          }
+
           this.setState(prev => ({ hits: [...prev.hits, ...data.hits] }));
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          console.log(error);
+          return toast.error('Something went wrong. Please try again later.');
+        })
+        .finally(() => {
+          this.setState({ isLoader: false });
+        });
     }
   }
 
   handleSubmit = searchValue => {
-    this.setState({ searchValue, page: 1, hits: [] });
+    this.setState({ searchValue, page: 1, hits: [], isLoadBtn: false });
+  };
+
+  handleLoadMore = () => {
+    this.setState(prev => ({ page: prev.page + 1 }));
   };
 
   render() {
-    const { hits } = this.state;
+    const { hits, isLoader, isLoadBtn } = this.state;
+    const showLoadBtn = hits && hits.length > 0 && !isLoadBtn;
     return (
       <Container>
         <Searchbar onSubmit={this.handleSubmit} />
+
+        {isLoader && <Loader />}
 
         {hits && (
           <ImageGallery>
@@ -59,7 +85,9 @@ class App extends Component {
           </ImageGallery>
         )}
 
-        <Button />
+        {showLoadBtn && <Button onBtnClick={() => this.handleLoadMore()} />}
+
+        {/* <Modal /> */}
 
         <ToastContainer autoClose={3000} theme="colored" />
       </Container>

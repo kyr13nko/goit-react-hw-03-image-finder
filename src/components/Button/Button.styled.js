@@ -1,5 +1,10 @@
 import { styled } from 'styled-components';
 
+export const LoadButtonWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 export const LoadButton = styled.button`
   padding: 8px 16px;
   border-radius: 2px;
