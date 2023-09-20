@@ -1,13 +1,30 @@
+import { Component } from 'react';
 import { ModalWrapper, Overlay } from './Modal.styled';
 
-const Modal = () => {
-  return (
-    <Overlay>
-      <ModalWrapper>
-        <img src="" alt="" />
-      </ModalWrapper>
-    </Overlay>
-  );
-};
+class Modal extends Component {
+  componentDidMount() {
+    window.addEventListener('keydown', this.handleEscape);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleEscape);
+  }
+
+  handleEscape = event => {
+    if (event.code === 'Escape') this.props.onClose();
+  };
+
+  handleBackdrop = event => {
+    if (event.target === event.currentTarget) this.props.onClose();
+  };
+
+  render() {
+    return (
+      <Overlay onClick={this.handleBackdrop}>
+        <ModalWrapper>{this.props.children}</ModalWrapper>
+      </Overlay>
+    );
+  }
+}
 
 export default Modal;

@@ -5,13 +5,13 @@ import ImageGallery from 'components/ImageGallery/ImageGallery';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Button from 'components/Button/Button';
 import Loader from 'components/Loader/Loader';
-// import Modal from 'components/Modal/Modal';
+import Modal from 'components/Modal/Modal';
 
 import { getImage } from 'services/getImageAPI';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Container } from './App.styled';
+import { Container, Image } from './App.styled';
 
 class App extends Component {
   state = {
@@ -20,6 +20,9 @@ class App extends Component {
     hits: null,
     isLoader: false,
     isLoadBtn: false,
+    showModal: false,
+    modalImage: '',
+    tags: '',
   };
 
   componentDidUpdate(_, prevState) {
@@ -47,7 +50,7 @@ class App extends Component {
 
           if (page === lastPage) {
             this.setState({ isLoadBtn: true });
-            toast.info('No more images');
+            toast.info('Thats all images');
           }
 
           this.setState(prev => ({ hits: [...prev.hits, ...data.hits] }));
@@ -70,8 +73,18 @@ class App extends Component {
     this.setState(prev => ({ page: prev.page + 1 }));
   };
 
+  toggleModal = () => {
+    this.setState(prev => ({ showModal: !prev.showModal }));
+  };
+
+  handleImageClick = (largeImageURL, tags) => {
+    this.setState({ modalImage: largeImageURL, tags });
+    this.toggleModal();
+  };
+
   render() {
-    const { hits, isLoader, isLoadBtn } = this.state;
+    const { hits, isLoader, isLoadBtn, showModal, modalImage, tags } =
+      this.state;
     const showLoadBtn = hits && hits.length > 0 && !isLoadBtn;
     return (
       <Container>
@@ -81,13 +94,20 @@ class App extends Component {
 
         {hits && (
           <ImageGallery>
-            <ImageGalleryItem images={hits} />
+            <ImageGalleryItem
+              images={hits}
+              onImageClick={this.handleImageClick}
+            />
           </ImageGallery>
         )}
 
         {showLoadBtn && <Button onBtnClick={() => this.handleLoadMore()} />}
 
-        {/* <Modal /> */}
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <Image src={modalImage} alt={tags} />
+          </Modal>
+        )}
 
         <ToastContainer autoClose={3000} theme="colored" />
       </Container>

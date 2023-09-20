@@ -1,10 +1,14 @@
 import { Image, Item } from './ImageGalleryItem.styled';
 
-const ImageGalleryItem = ({ images }) => {
-  return images.map(({ id, webformatURL, tags }) => {
+const ImageGalleryItem = ({ images, onImageClick }) => {
+  return images.map(({ id, webformatURL, largeImageURL, tags }) => {
     return (
       <Item key={id}>
-        <Image src={webformatURL} alt={tags} />
+        <Image
+          src={webformatURL}
+          alt={tags}
+          onClick={() => onImageClick(largeImageURL, tags)}
+        />
       </Item>
     );
   });
