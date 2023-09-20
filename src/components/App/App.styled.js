@@ -8,6 +8,6 @@ export const Container = styled.div`
 `;
 
 export const Image = styled.img`
-  width: 100%;
-  height: calc(100% - 20px);
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 24px);
 `;
